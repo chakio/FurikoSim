@@ -42,4 +42,6 @@ class ofApp : public ofBaseApp{
 		double M_PI = 3.14159265359;
 		vector<Furiko> Furikos;
 		ofEasyCam cam;
+
+		bool start = false;
 };

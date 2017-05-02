@@ -28,37 +28,44 @@ void ofApp::setup() {
 
 //--------------------------------------------------------------
 void ofApp::update(){
-	for (int i = 0; i < Furikos.size(); i++)
+	if (start)
 	{
-		Furikos[i].caltheta(ofGetElapsedTimeMillis());
+		for (int i = 0; i < Furikos.size(); i++)
+		{
+			Furikos[i].caltheta(ofGetElapsedTimeMillis());
+		}
 	}
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
 	cam.begin();
-	ofSetLineWidth(2);
-	for (int i = 0; i < Furikos.size(); i++)
-	{
-		ofSpherePrimitive sphere;
-		ofPoint p1(0, 0+ofGetHeight()/2*0, -i * 30);
-		ofPoint p2(1 *500*cos(Furikos[i].Theta-M_PI/2), ofGetHeight() / 4+ 1 *500*sin(Furikos[i].Theta - M_PI / 2), -i * 30);
+	
+		ofSetLineWidth(1);
+		for (int i = 0; i < Furikos.size(); i++)
+		{
+			ofSpherePrimitive sphere;
+			ofPoint p1(0, 0 + ofGetHeight() / 2, -i * 30);
+			ofPoint p2(Furikos[i].Length * 2000 * cos(Furikos[i].Theta - M_PI / 2), ofGetHeight() / 2 + Furikos[i].Length *2000 * sin(Furikos[i].Theta - M_PI / 2), -i * 30);
 
+			ofSetColor(255, 255, 255);
+			ofDrawLine(p1, p2);
+			ofSetColor(calcolor(Furikos[i].Theta, (double)40 / 180 * M_PI));
+			sphere.set(20, 3);
+			sphere.setPosition(p2);
+			sphere.draw();
+		}
 		ofSetColor(255, 255, 255);
+		ofPoint p1(0, 0 + ofGetHeight() / 2, 0);
+		ofPoint p2(0, 0 + ofGetHeight() / 2, -420);
+		ofSetLineWidth(10);
 		ofDrawLine(p1, p2);
-		ofSetColor(calcolor(Furikos[i].Theta, (double)40 / 180 * M_PI));
-		sphere.set(10,8);
-		sphere.setPosition(p2);
-		sphere.draw();
-	}
-	ofSetColor(255, 255, 255);
-	ofPoint p1(0, 0 + ofGetHeight() / 4*0, 0);
-	ofPoint p2(0, 0 + ofGetHeight() / 4*0, -420);
-	ofSetLineWidth(10);
-	ofDrawLine(p1, p2);
+	
 	cam.end();
 
-
+	stringstream ss;
+	ss << "framerate: " << ofToString(ofGetFrameRate(), 0);
+	ofDrawBitmapString(ss.str(), 10, 20);
 	
 }
 
@@ -96,14 +103,14 @@ double ofApp::calLength(double time, double theta) {
 	A = (time*time)*9.8 / (4 * M_PI*M_PI);
 
 	double E = 1;
-	for (int i = 1; i < 10; i++)
+	for (int i = 1; i < 30; i++)
 	{
-		int B = 1;
+		double B = 1;
 		for (int j = 1; j < i+1; j++)
 		{
 			B *= (2*j-1);
 		}
-		int C=1;
+		double C=1;
 		for (int k = 1; k < i+1; k++)
 		{
 			C *=(2*k);
@@ -114,18 +121,26 @@ double ofApp::calLength(double time, double theta) {
 			D *= sin(theta / 2);
 		}
 		double E1 = 0;
-		E1 = ((double)B / (double)C)*((double)B / (double)C)*D;
+		E1 = ((double)B*(double)B) / ((double)C *(double)C)*D;
 		E += E1;
+		//cout << E << endl;
 	}
 	double Length;
-	Length = A / (E*E);
+	Length = (double)A / ((double)E*(double)E);
 	//Length = E;
-	cout << Length << endl;
+	//cout << E << endl;
 	return Length;
 }
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
+	if (key == 's')
+	{
+		start = true;
+		for (int i = 0; i < Furikos.size(); i++)
+		{
+			Furikos[i].beforetime=ofGetElapsedTimeMillis();
+		}
+	}
 }
 
 //--------------------------------------------------------------
